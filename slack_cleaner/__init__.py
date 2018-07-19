@@ -1,3 +1,3 @@
-__author__ = 'Lin, Ke-fei'
-__authoremail__ = 'kfei@kfei.net'
-__version__ = '0.3.0'
+__author__ = 'Gold, Robert'
+__authoremail__ = '18goldr@gmail.com'
+__version__ = '1.0'
