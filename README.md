@@ -26,3 +26,5 @@ python cli.py --token <TOKEN> -f <FILE_TO_WRITE> --perform
 python cli.py --help
 
 ```
+
+Generate tokens with the following link: https://api.slack.com/custom-integrations/legacy-tokens
