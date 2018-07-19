@@ -70,7 +70,7 @@ def get_files():
 
         with open(args.files_to_delete, 'w') as to_delete:
             for f in files:
-                to_delete.write(f['id'] + '\n')
+                to_delete.write(f['id'] + " : " + f.get('title', '') + '\n')
                 logger.warning(Colors.YELLOW + 'Will delete file -> ' + Colors.ENDC
                                + f.get('title', ''))
 
