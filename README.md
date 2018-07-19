@@ -11,6 +11,8 @@ Download package then install `slacker` through the command:
 ## Usage
 
 ```bash
+
+# Switch into the slack_cleaner folder from the base of the project
 cd slack_cleaner
 
 # Write all files on slack server to file. Does not delete files.
