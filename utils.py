@@ -1,8 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import time
-
-
 class Colors():
     HEADER = '\033[95m'
     BLUE = '\033[94m'
@@ -12,6 +9,7 @@ class Colors():
     ENDC = '\033[0m'
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
+
 
 class Counter():
     def __init__(self):

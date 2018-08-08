@@ -12,9 +12,6 @@ Download package then install `slacker` through the command:
 
 ```bash
 
-# Switch into the slack_cleaner folder from the base of the project
-cd slack_cleaner
-
 # Write all files on slack server to file. Does not delete files.
 # Delete file names from the given file that you want to keep.
 python cli.py --token <TOKEN> -f <FILE_TO_WRITE>

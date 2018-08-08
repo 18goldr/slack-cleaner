@@ -7,9 +7,9 @@ import mmap
 
 from slacker import Slacker
 
-from slack_cleaner import __version__
-from slack_cleaner.utils import Colors, Counter
-from slack_cleaner.args import Args
+from __init__ import __version__
+from utils import Colors, Counter
+from args import Args
 
 
 # Get and parse command line arguments
@@ -52,6 +52,7 @@ def delete_file(file):
 
     counter.increase()
 
+
 def get_files():
     has_more = True
     while has_more:
@@ -73,6 +74,7 @@ def get_files():
                 to_delete.write(f['id'] + " : " + f.get('title', '') + '\n')
                 logger.warning(Colors.YELLOW + 'Will delete file -> ' + Colors.ENDC
                                + f.get('title', ''))
+
 
 def remove_files():
 
@@ -96,6 +98,7 @@ def remove_files():
             for f in files:
                 if s.find(str.encode(f['id'])) != -1:
                     delete_file(f)
+
 
 def main():
     if not args.perform:
