@@ -98,6 +98,9 @@ def remove_files():
             sys.exit(1)
 
         files = res['files']
+        current_page = res['paging']['page']
+        total_pages = res['paging']['pages']
+        has_more = current_page < total_pages
 
         with open(args.files_to_delete, 'rb', 0) as file, \
                 mmap.mmap(file.fileno(), 0, access=mmap.ACCESS_READ) as s:

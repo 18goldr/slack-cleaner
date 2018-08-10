@@ -32,7 +32,7 @@ class Args:
 
         self.batch_size = args.batchsize
 
-        if self.batch_size < 0:
+        if (self.batch_size is not None) and (self.batch_size < 0):
             print("Batch size much be positive!")
             sys.exit()
 
