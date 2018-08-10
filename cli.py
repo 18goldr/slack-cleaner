@@ -71,7 +71,7 @@ def get_files():
 
         with open(args.files_to_delete, 'w') as to_delete:
             for f in files:
-                to_delete.write(f['id'] + " : " + f.get('title', '') + '\n')
+                to_delete.write(f['id'] + " : " + f.get('title', '') + " : size=" + str(f.get('size')) + '\n')
                 logger.warning(Colors.YELLOW + 'Will delete file -> ' + Colors.ENDC
                                + f.get('title', ''))
 
@@ -94,7 +94,7 @@ def remove_files():
         page = current_page + 1
 
         with open(args.files_to_delete, 'rb', 0) as file, \
-             mmap.mmap(file.fileno(), 0, access=mmap.ACCESS_READ) as s:
+                mmap.mmap(file.fileno(), 0, access=mmap.ACCESS_READ) as s:
             for f in files:
                 if s.find(str.encode(f['id'])) != -1:
                     delete_file(f)
