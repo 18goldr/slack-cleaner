@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 
 import argparse
+import sys
 
 
-class Args():
+class Args:
     def __init__(self):
         p = argparse.ArgumentParser(prog='slack-cleaner')
 
@@ -18,6 +19,9 @@ class Args():
         p.add_argument('--file', '-f', type=str, required=True,
                        help='File to write and read files that are to be deleted')
 
+        p.add_argument('--batchsize', '--bs', type=int, required=False,
+                       help='The number of files to delete (batch size)')
+
         args = p.parse_args()
 
         self.token = args.token
@@ -25,3 +29,10 @@ class Args():
         self.perform = args.perform
 
         self.files_to_delete = args.file
+
+        self.batch_size = args.batchsize
+
+        if self.batch_size < 0:
+            print("Batch size much be positive!")
+            sys.exit()
+

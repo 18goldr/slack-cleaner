@@ -55,6 +55,8 @@ def delete_file(file):
 
 def get_files():
     has_more = True
+    listed = 0
+    exit_loop = False
     while has_more:
         res = slack.files.list().body
 
@@ -67,18 +69,26 @@ def get_files():
         current_page = res['paging']['page']
         total_pages = res['paging']['pages']
         has_more = current_page < total_pages
-        page = current_page + 1
 
         with open(args.files_to_delete, 'w') as to_delete:
             for f in files:
-                to_delete.write(f['id'] + " : " + f.get('title', '') + " : size=" + str(f.get('size')) + '\n')
-                logger.warning(Colors.YELLOW + 'Will delete file -> ' + Colors.ENDC
-                               + f.get('title', ''))
+                if listed == args.batch_size:
+                    exit_loop = True
+                    break
+                else:
+                    to_delete.write(f['id'] + " : " + f.get('title', '') + " : size=" + str(f.get('size')) + '\n')
+                    logger.warning(Colors.YELLOW + 'Will delete file -> ' + Colors.ENDC
+                                   + f.get('title', ''))
+                    listed += 1
+
+        if exit_loop:
+            break
 
 
 def remove_files():
-
     has_more = True
+    deleted = 0
+    exit_loop = False
     while has_more:
         res = slack.files.list().body
 
@@ -88,16 +98,20 @@ def remove_files():
             sys.exit(1)
 
         files = res['files']
-        current_page = res['paging']['page']
-        total_pages = res['paging']['pages']
-        has_more = current_page < total_pages
-        page = current_page + 1
 
         with open(args.files_to_delete, 'rb', 0) as file, \
                 mmap.mmap(file.fileno(), 0, access=mmap.ACCESS_READ) as s:
             for f in files:
-                if s.find(str.encode(f['id'])) != -1:
+                if deleted == args.batch_size:
+                    exit_loop = True
+                    break
+
+                elif s.find(str.encode(f['id'])) != -1:
                     delete_file(f)
+                    deleted += 1
+
+        if exit_loop:
+            break
 
 
 def main():
