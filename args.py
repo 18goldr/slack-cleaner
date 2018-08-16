@@ -22,6 +22,10 @@ class Args:
         p.add_argument('--batchsize', '--bs', type=int, required=False,
                        help='The number of files to delete (batch size)')
 
+        # Rate limit
+        p.add_argument('--rate', type=int,
+                       help='Delay between API calls (in seconds)')
+
         args = p.parse_args()
 
         self.token = args.token
@@ -32,7 +36,9 @@ class Args:
 
         self.batch_size = args.batchsize
 
+        self.rate_limit = args.rate
+
         if (self.batch_size is not None) and (self.batch_size < 0):
             print("Batch size much be positive!")
-            sys.exit()
+            sys.exit(1)
 

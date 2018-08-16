@@ -4,6 +4,7 @@ import logging
 import pprint
 import sys
 import mmap
+import time
 
 from slacker import Slacker
 
@@ -37,18 +38,14 @@ logger.info('Running slack-cleaner v' + __version__)
 
 
 def delete_file(file):
-    # Actually perform the task
-    if args.perform:
-        try:
-            # No response is a good response
-            slack.files.delete(file['id'])
-        except:
-            logger.error(Colors.YELLOW + 'Failed to delete ->' + Colors.ENDC)
-            pp.pprint(file)
-            return
+    try:
+        slack.files.delete(file['id'])
+    except Exception as e:
+        logger.error(Colors.YELLOW + 'Failed to delete -> ' + Colors.ENDC + file.get('title') + '\n' + str(e))
+        return
 
-        logger.warning(Colors.RED + 'Deleted file -> ' + Colors.ENDC
-                       + file.get('title', ''))
+    logger.warning(Colors.RED + 'Deleted file -> ' + Colors.ENDC
+                   + file.get('title', ''))
 
     counter.increase()
 
@@ -57,8 +54,13 @@ def get_files():
     has_more = True
     listed = 0
     exit_loop = False
-    while has_more:
-        res = slack.files.list().body
+    page = 1
+
+    # Empty the file
+    open(args.files_to_delete, 'w').close()
+
+    while True:
+        res = slack.files.list(page=page).body
 
         if not res['ok']:
             logger.error('Error occurred on Slack\'s API:')
@@ -66,11 +68,16 @@ def get_files():
             sys.exit(1)
 
         files = res['files']
+
+        if len(files) == 0:
+            break
+
         current_page = res['paging']['page']
         total_pages = res['paging']['pages']
-        has_more = current_page < total_pages
+        # has_more = current_page < total_pages
+        page = current_page + 1
 
-        with open(args.files_to_delete, 'w') as to_delete:
+        with open(args.files_to_delete, 'a') as to_delete:
             for f in files:
                 if listed == args.batch_size:
                     exit_loop = True
@@ -84,13 +91,16 @@ def get_files():
         if exit_loop:
             break
 
+    logger.warning('\n' + "Number of Files: " + str(listed))
+
 
 def remove_files():
     has_more = True
     deleted = 0
     exit_loop = False
+    page = 1
     while has_more:
-        res = slack.files.list().body
+        res = slack.files.list(page=page).body
 
         if not res['ok']:
             logger.error('Error occurred on Slack\'s API:')
@@ -98,12 +108,15 @@ def remove_files():
             sys.exit(1)
 
         files = res['files']
+
         current_page = res['paging']['page']
         total_pages = res['paging']['pages']
         has_more = current_page < total_pages
+        page = current_page + 1
 
         with open(args.files_to_delete, 'rb', 0) as file, \
                 mmap.mmap(file.fileno(), 0, access=mmap.ACCESS_READ) as s:
+
             for f in files:
                 if deleted == args.batch_size:
                     exit_loop = True
@@ -116,12 +129,23 @@ def remove_files():
         if exit_loop:
             break
 
+        if args.rate_limit:
+            time.sleep(args.rate_limit)
+
+    if page == 1:
+        return 1
+
+    print('\n' + "Number of files: " + str(deleted))
+
 
 def main():
     if not args.perform:
         get_files()
     else:
-        remove_files()
+        while True:
+            x = remove_files()
+            if x == 1:
+                break
 
     if not args.perform:
         logger.info('Now you can re-run this program with `--perform`' +
